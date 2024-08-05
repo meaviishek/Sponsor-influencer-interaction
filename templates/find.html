@@ -1,0 +1,254 @@
+{% extends "layout.html" %}
+{% block content %}
+<div>
+  
+
+<nav class="bg-white border-gray-200 dark:bg-gray-900">
+  <div class="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
+  <a href="https://flowbite.com/" class="flex items-center space-x-3 rtl:space-x-reverse">
+      
+      <span class="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">{{user.role}}</span>
+  </a>
+  <div class="flex md:order-2 space-x-3 md:space-x-0 rtl:space-x-reverse">
+    <a href='/logout'>  <button type="button" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Logout</button></a>
+    
+    </button>
+  </div>
+  <div class="items-center justify-between hidden w-full md:flex md:w-auto md:order-1" id="navbar-cta">
+    <ul class="flex flex-col font-medium p-4 md:p-0 mt-4 border border-gray-100 rounded-lg bg-gray-50 md:space-x-8 rtl:space-x-reverse md:flex-row md:mt-0 md:border-0 md:bg-white dark:bg-gray-800 md:dark:bg-gray-900 dark:border-gray-700">
+      <li class=" p-2 text-white rounded-md">
+        <a href="/profile" class="block py-2 px-3 md:p-0 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:dark:hover:text-blue-500 dark:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700">Profile</a>
+      </li>
+      {% if user.role =='Sponsor'%}
+      <li  class=" p-2 text-white rounded-md">
+        <a href="/campaign" class="block py-2 px-3 md:p-0 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:dark:hover:text-blue-500 dark:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700">Campaign</a>
+      </li>
+      {% endif %}
+      <li class="bg-blue-500 p-2  text-white rounded-md">
+        <a href="/find" class="block py-2 px-3 md:p-0 text-white bg-blue-700 rounded md:bg-transparent" aria-current="page">Find</a>
+      </li>
+      <li class=" p-2 text-white rounded-md">
+        <a href="/stats" class="block py-2 px-3 md:p-0 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:dark:hover:text-blue-500 dark:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700">Stats</a>
+      </li>
+     
+    </ul>
+  </div>
+  </div>
+</nav>
+
+{% if user.role == 'Influencer'%}
+<div class="container mx-auto py-8">
+  <h2 class="text-2xl mb-4">Search Campaigns</h2>
+  
+  <form method="POST" action="{{ url_for('find') }}" class="mb-4">
+      <input type="text" name="search_term" placeholder="Search for campaigns" class="border p-2 rounded w-full" required>
+      <button type="submit" class="mt-2 bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600">Search</button>
+  </form>
+
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+      {% for campaign in campaigns %}
+      <div class="bg-white shadow-md rounded-lg overflow-hidden">
+          <div class="p-4">
+              <h3 class="text-lg font-semibold mb-2">{{ campaign.name }}</h3>
+              <p class="text-gray-600">{{ campaign.description }}</p>
+              <ul class="mt-4 space-y-2">
+                  <li><strong>Start Date:</strong> {{ campaign.start_date }}</li>
+                  <li><strong>End Date:</strong> {{ campaign.end_date }}</li>
+                  <li><strong>Budget:</strong> ${{ campaign.budget }}</li>
+                  <li><strong>Visibility:</strong> {{ campaign.visibility }}</li>
+              </ul>
+              <div class="mt-4 flex ">
+              <!-- <button type="button" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" onclick="openCampaignModal('{{ campaign.name }}', '{{ campaign.description }}', '{{ campaign.start_date }}', '{{ campaign.end_date }}', '{{ campaign.budget }}')">View</button>--> 
+                  {% if campaign.id not in requested %}
+                  <button type="button" class="mx-2 bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded " onclick="showNegotiationForm()">Negotiate</button>
+                  <form method="POST" action="{{ url_for('create_ad_request') }}" class="flex">
+                    <div id="negotiationForm" class="hidden">
+                  
+                    <label for="newPrice" class="block text-sm font-medium text-gray-700">Propose New Price</label>
+                    <input type="number" name="new_price" id="newPrice" class=" block w-full bg-gray-100 border-gray-300 border-2 rounded-md shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+                    </div>
+                 
+                 
+                    <input type="hidden" name="campaign_id" value="{{ campaign.id }}">
+                    <button class="bg-green-600 mx-2 text-white py-2 px-4 rounded" >Request</button>
+              
+                  </form>
+                  {% else %}
+                    <button class="bg-gray-500 text-white py-2 px-4 rounded" disabled>Requested</button>
+                    {% endif %}
+              </div>
+          </div>
+      </div>
+   
+      {% endfor %}
+  </div>
+  
+  {% elif user.role == 'Sponsor'%}
+
+  <div class="container mx-auto py-8">
+    <h2 class="text-2xl mb-4">Search Influencers</h2>
+    
+    <form method="POST" action="{{ url_for('find') }}" class="mb-4">
+        <input type="text" name="search_term" placeholder="Search for influencer" class="border p-2 rounded w-full" required>
+        <button type="submit" class="mt-2 bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600">Search</button>
+    </form>
+  
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        {% for influencer in influencers %}
+        <div class="bg-white shadow-md rounded-lg overflow-hidden">
+            <div class="p-4">
+                <h3 class="text-lg font-semibold mb-2">{{ influencer.name }}</h3>
+           
+                <ul class="mt-4 space-y-2">
+                    <li><strong>Category:</strong> {{ influencer.category }}</li>
+                    <li><strong>Niche:</strong> {{ influencer.niche }}</li>
+                    <li><strong>Reach:</strong> {{ influencer.reach }}</li>
+              
+                </ul>
+                <div class="mt-4">
+                     <button type="button" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" onclick="openInfluencerModal('{{ influencer.name }}', '{{ influencer.category }}', '{{ influencer.niche }}', '{{ influencer.reach }}', '{{ url_for('static', filename=influencer.profile_img) }}')">View</button>
+                   
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+
+
+   {%else%}
+
+
+   <div class="container mx-auto py-8">
+    <h2 class="text-2xl mb-4">Search Influencers or campaigns </h2>
+    
+    <form method="POST" action="{{ url_for('find') }}" class="mb-4">
+        <input type="text" name="search_term" placeholder="Search for influencers or campaigns" class="border p-2 rounded w-full" required>
+        <button type="submit" class="mt-2 bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600">Search</button>
+    </form>
+  
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+        {% for influencer in influencers %}
+        <div class="bg-white shadow-md rounded-lg overflow-hidden">
+            <div class="p-4">
+                <h3 class="text-lg font-semibold mb-2">{{ influencer.name }}</h3>
+           
+                <ul class="mt-4 space-y-2">
+                    <li><strong>Category:</strong> {{ influencer.category }}</li>
+                    <li><strong>Niche:</strong> {{ influencer.niche }}</li>
+                    <li><strong>Reach:</strong> ${{ influencer.reach }}</li>
+              
+                </ul>
+                <div class="mt-4 flex">
+                    
+                     
+                     <form action="{{ url_for('flag_entity') }}" method="POST">
+                     <input type="hidden" name="entity_id" value="{{ influencer.id }}">
+                    <input type="hidden" name="entity_type" value="user">
+                    <input type="hidden" name="action" value="{{ 'unflag' if influencer.user.flag else 'flag' }}">
+                     <button type="submit" class="bg-{{ 'green' if user.flagged else 'red' }}-500 hover:bg-{{ 'green' if user.flagged else 'red' }}-700 text-white font-bold py-2 px-4 rounded">
+                      {{ 'Unflag' if influencer.user.flag else 'Flag' }}
+                  </button>
+                </form>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+        
+    </div>
+    
+    <div class="grid grid-cols-1 mt-6 md:grid-cols-4 gap-8">
+    {% for campaign in campaigns %}
+    <div class="bg-white shadow-md rounded-lg overflow-hidden">
+        <div class="p-4">
+            <h3 class="text-lg font-semibold mb-2">{{ campaign.name }}</h3>
+            <p class="text-gray-600">{{ campaign.description }}</p>
+            <ul class="mt-4 space-y-2">
+                <li><strong>Start Date:</strong> {{ campaign.start_date }}</li>
+                <li><strong>End Date:</strong> {{ campaign.end_date }}</li>
+                <li><strong>Budget:</strong> ${{ campaign.budget }}</li>
+                <li><strong>Visibility:</strong> {{ campaign.visibility }}</li>
+            </ul>
+            <div class="mt-4 flex ">
+            <!-- <button type="button" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" onclick="openCampaignModal('{{ campaign.name }}', '{{ campaign.description }}', '{{ campaign.start_date }}', '{{ campaign.end_date }}', '{{ campaign.budget }}')">View</button>--> 
+    
+               
+                <form action="{{ url_for('flag_entity') }}" method="POST">
+                  <input type="hidden" name="entity_id" value="{{ campaign.id }}">
+                  <input type="hidden" name="entity_type" value="campaign">
+                  <input type="hidden" name="action" value="{{ 'unflag' if campaign.flagged else 'flag' }}">
+                  <button type="submit" class="bg-{{ 'green' if campaign.flagged else 'red' }}-500 hover:bg-{{ 'green' if campaign.flagged else 'red' }}-700 text-white font-bold py-2 px-4 rounded">
+                      {{ 'Unflag' if campaign.flag else 'Flag' }}
+                  </button>
+            
+                </form>
+              
+            </div>
+        </div>
+    </div>
+ 
+    {% endfor %}
+
+  </div>
+
+
+
+
+  {%endif%}
+</div>
+
+
+{% if user.role == 'Sponsor'%}
+<div class="fixed z-10 inset-0 overflow-y-auto hidden" id="influencerModal">
+  <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+    <div class="fixed inset-0 transition-opacity" aria-hidden="true">
+      <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
+    </div>
+    <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+    <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+      <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+        <div class="sm:flex sm:items-start">
+          <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+            <h3 class="text-lg leading-6 font-medium text-gray-900" id="modalTitle">Influencer Details</h3>
+            <div class="mt-2">
+              <img id="modalInfluencerProfileImage" src="{{ url_for('static', filename=influencers.profile_img) }}" alt="Profile Image" class="rounded-full w-32 h-32 mb-4">
+              <p><strong>Name:</strong> <span id="modalInfluencerName"></span></p>
+              <p><strong>Category:</strong> <span id="modalInfluencerCategory"></span></p>
+              <p><strong>Niche:</strong> <span id="modalInfluencerNiche"></span></p>
+              <p><strong>Reach:</strong> <span id="modalInfluencerReach"></span></p>
+              <p><strong>Earnings:</strong> $<span id="modalInfluencerEarnings"></span></p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+        <button type="button" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded" onclick="closeModal('influencerModal')">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+{%endif%}
+
+
+
+<script>
+  function openInfluencerModal(name, category, niche, reach, imageUrl) {
+      document.getElementById('modalInfluencerName').innerText = name;
+      document.getElementById('modalInfluencerCategory').innerText = category;
+      document.getElementById('modalInfluencerNiche').innerText = niche;
+      document.getElementById('modalInfluencerReach').innerText = reach;
+      document.getElementById('modalInfluencerProfileImage').src = imageUrl;
+      document.getElementById('influencerModal').classList.remove('hidden');
+  }
+  
+ 
+  
+  function closeModal(modalId) {
+      document.getElementById(modalId).classList.add('hidden');
+  }
+
+function showNegotiationForm() {
+  document.getElementById('negotiationForm').classList.remove('hidden');
+}
+  </script>
+{% endblock  %}

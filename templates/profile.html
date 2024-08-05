@@ -1,0 +1,656 @@
+{% extends "layout.html" %}
+{% block content %}
+<div>
+  
+
+<nav class="bg-white border-gray-200 dark:bg-gray-900">
+  <div class="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
+  <a href="https://flowbite.com/" class="flex items-center space-x-3 rtl:space-x-reverse">
+      
+      <span class="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">{{profile_info.role}}</span>
+  </a>
+  <div class="flex md:order-2 space-x-3 md:space-x-0 rtl:space-x-reverse">
+    <a href='/logout'>  <button type="button" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Logout</button></a>
+    
+    </button>
+  </div>
+  <div class="items-center justify-between hidden w-full md:flex md:w-auto md:order-1" id="navbar-cta">
+    <ul class="flex flex-col font-medium p-4 md:p-0 mt-4 border border-gray-100 rounded-lg bg-gray-50 md:space-x-8 rtl:space-x-reverse md:flex-row md:mt-0 md:border-0 md:bg-white dark:bg-gray-800 md:dark:bg-gray-900 dark:border-gray-700">
+      <li class="bg-blue-500 p-2  text-white rounded-md">
+        <a href="/profile" class="block py-2 px-3 md:p-0 text-white rounded md:bg-transparent  " aria-current="page">Profile</a>
+      </li>
+      {% if profile_info.role=='Sponsor'%}
+      <li  class=" p-2 text-white rounded-md">
+        <a href="/campaign" class="block py-2 px-3 md:p-0 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:dark:hover:text-blue-500 dark:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700">Campaign</a>
+      </li>
+      {%endif%}
+      <li  class=" p-2 text-white rounded-md">
+        <a href="/find" class="block py-2 px-3 md:p-0 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:dark:hover:text-blue-500 dark:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700">Find</a>
+      </li>
+      <li class=" p-2 text-white rounded-md">
+        <a href="/stats" class="block py-2 px-3 md:p-0 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:dark:hover:text-blue-500 dark:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700">Stats</a>
+      </li>
+     
+    </ul>
+  </div>
+  </div>
+</nav>
+{% with messages = get_flashed_messages(with_categories=true) %}
+{% if messages %}
+  {% for category, message in messages %}
+    <div id="flash-message" class="rounded mb-2 {% if category == 'success' %}bg-green-500{% elif category == 'error' %}bg-red-500{% else %}bg-yellow-500{% endif %} text-white">
+      {{ message }}
+    </div>
+  {% endfor %}
+{% endif %}
+{% endwith %}
+
+
+
+<div class="bg-gray-100">
+  <div class="container mx-auto py-8">
+      <div class="grid grid-cols-4 sm:grid-cols-12 gap-6 px-4 ">
+          <div class="col-span-4 sm:col-span-3">
+              <div class="bg-white shadow rounded-lg p-6">
+
+                {%if profile_info.role == 'Influencer'%}
+  
+                 <i id="edit-profile-icon" class="fas fa-edit text-gray-500 text-2xl cursor-pointer"></i>
+                  <div class="flex flex-col items-center">
+                    {% if profile_info.profile_image %}
+                      <img src="{{ url_for('static', filename=profile_info.profile_image) }}" class="w-32 h-32 bg-gray-300 rounded-full mb-4 shrink-0">
+                     
+                      </img>
+                      {%endif%}
+                      <div >
+                      <h1 class="text-xl font-bold">{{profile_info.name}}</h1>
+                      <h1 class="text-xl "><b>Username:</b> {{profile_info.username}}</h1>
+                      <p class="text-gray-800 text-lg"><b>Category:</b> {{profile_info.category}}</p>
+                      <p class="text-gray-800 text-lg"><b>Followers:</b> {{profile_info.reach}}</p>
+                      <p class="text-gray-800 text-lg"><b>Total Earnings:</b> $ {{profile_info.earnings}}</p>
+                      </div>
+                  </div>
+                  
+                  {% elif profile_info.role == 'Sponsor'%}
+                  <div>
+                    <i id="edit-profile-icon" class="fas fa-edit text-blue-500 text-2xl cursor-pointer"></i>
+                    <h1 class="text-xl font-bold">Welcome {{profile_info.username}}</h1>
+                    <p class="text-gray-800 text-lg">Comapny: {{profile_info.company}}</p>
+                    <p class="text-gray-800 text-lg">Industry: {{profile_info.industry}}</p>
+                    
+                    </div>
+
+                  <hr class="my-6 border-t border-gray-300">
+                  {%else %}
+                  <div>
+                    <h1 class="text-xl font-bold">Welcome {{profile_info.username}}</h1>
+               
+                    
+                    </div>
+
+                  <hr class="my-6 border-t border-gray-300">
+
+                  {%endif%}
+              </div>
+           
+          </div>
+          
+          <div class="col-span-4 sm:col-span-9">
+              <div class="bg-white shadow rounded-lg p-6">
+
+
+                {% if profile_info.role == 'Sponsor'%}
+
+               
+
+                  <h2 class="text-xl font-bold mb-4"> Campaigns</h2>
+                  <h3 class="text-xl font-semibold mb-4 mt-6">New Campaign Requests</h3>
+                  <table class="table-auto w-full bg-white shadow-md">
+                      <thead>
+                          <tr class="bg-gray-200 ">
+                              <th class="px-4 py-2">Campaign Name</th>
+                             
+                              <th class="px-4 py-2">Influencer</th>
+                            
+                              <th class="px-4 py-2">Actions</th>
+                          </tr>
+                      </thead>
+                      <tbody>
+                          {% for request in profile_info.new_requests %}
+                          <tr>
+                              <td class="border px-4 py-2">id: {{request.campaign.id}} {{ request.campaign.name }}</td>
+                         
+                              <td class="border px-4 py-2">{{request.influencer.user.username }}</td>
+                             
+
+                              <td class="border px-4 py-2">
+                                <button type="button" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-2" onclick="openInfluencerModal('{{ request.influencer.name }}', '{{ request.influencer.category }}', '{{ request.influencer.niche }}', '{{ request.influencer.reach }}', '{{ request.messages }}', '{{ url_for('static', filename=request.influencer.profile_img) }}')">View</button>
+                                  <form action="{{ url_for('accept_ad_request', ad_id=request.id) }}" method="post" style="display:inline;">
+                                      <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded">Accept</button>
+                                  </form>
+                                  <form action="{{ url_for('reject_ad_request', ad_id=request.id) }}" method="post" style="display:inline;">
+                                      <button type="submit" class="bg-red-500 text-white px-4 py-2 rounded">Reject</button>
+                                  </form>
+                              </td>
+                          </tr>
+                          {% endfor %}
+                      </tbody>
+                  </table>
+
+
+
+
+            
+
+
+
+                  <h3 class="text-xl font-semibold mb-4 mt-10">Active Campaigns</h3>
+                  <table class="table-auto w-full bg-white rounded shadow-md">
+                      <thead>
+                          <tr class="bg-gray-200">
+                              <th class="px-4 py-2">Campaign Name</th>
+                              <th class="px-4 py-2">Progreass</th>
+                              <th class="px-4 py-2">Influencer id</th>
+                              <th class="px-4 py-2">Actions</th>
+                          </tr>
+                      </thead>
+                      <tbody>
+                          {% for request in profile_info.active_campaigns %}
+                          <tr>
+                              <td class="border px-4 py-2">{{ request.campaign.name }}</td>
+                              <td class="border px-4 py-2">   <div class="mt-2">
+                                <div class="relative pt-1">
+                                    <div class="flex mb-2 items-center justify-between">
+                                        <div>
+                                            <span class="text-xs font-semibold inline-block py-1 px-2 uppercase rounded-full text-blue-600 bg-blue-200">
+                                                {{ request.progress }}% Complete
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="overflow-hidden h-2 mb-4 text-xs flex rounded bg-blue-200">
+                                        <div style="width: {{ request.progress }}%" class="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-blue-500"></div>
+                                    </div>
+                                </div>
+                            </div></td>
+                              <td class="border px-4 py-2">{{ request.influencer.user.username}}</td>
+                              <td class="border px-4 py-2">
+                                
+                                <button type="button" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" onclick="openModal('{{ request.campaign.name }}', '{{ request.campaign.description }}', '{{ request.campaign.start_date }}', '{{ request.campaign.end_date }}', '{{ request.payment_amount }}')">View</button>
+                                {% if request.payment_status == 'pending' and request.status == 'accepted' %}
+                             
+                                  <button onclick="openPaymentModal('{{ request.id }}', '{{ request.payment_amount }}')" class="mt-3 px-4 py-2 bg-green-600 text-white rounded">Pay</button>
+                          
+                                {%endif%}
+                              </td>
+                          </tr>
+                          {% endfor %}
+                      </tbody>
+                  </table>
+
+
+
+
+
+                  {%elif profile_info.role == 'Influencer'%}
+                  
+                  
+                  <h2 class="text-xl font-bold mb-4"> Campaigns</h2>
+                  <h3 class="text-xl font-semibold mb-4 mt-6">New Campaigns Requests</h3>
+                  <table class="table-auto w-full bg-white rounded shadow-md">
+                      <thead>
+                          <tr class="bg-gray-200">
+                              <th class="px-4 py-2">Campaign Name</th>
+                           
+                              <th class="px-4 py-2">Comapny Name</th>
+                             
+                         
+                            
+                              <th class="px-4 py-2">Actions</th>
+                          </tr>
+                      </thead>
+                      <tbody>
+                          {% for request in profile_info.new_requests %}
+                          <tr>
+                              <td class="border px-4 py-2">id: {{request.id}} {{ request.campaign.name }}</td>
+                             
+                              <td class="border px-4 py-2">{{request.campaign.sponsor.company }}</td>
+                             
+                             
+                              <td class="border px-4 py-2">
+                                <button type="button" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" onclick="openModal('{{ request.campaign.name }}', '{{ request.campaign.description }}', '{{ request.campaign.start_date }}', '{{ request.campaign.end_date }}', '{{ request.campaign.budget }}')">View</button>
+                                  <form action="{{ url_for('accept_ad_request', ad_id=request.id) }}" method="post" style="display:inline;">
+                                      <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded">Accept</button>
+                                  </form>
+                                  <form action="{{ url_for('reject_ad_request', ad_id=request.id) }}" method="post" style="display:inline;">
+                                      <button type="submit" class="bg-red-500 text-white px-4 py-2 rounded">Reject</button>
+                                  </form>
+                              </td>
+                          </tr>
+                          {% endfor %}
+                      </tbody>
+                  </table>
+
+
+
+
+            
+
+
+
+                  <h3 class="text-xl font-semibold mb-4 mt-10">Active Campaigns</h3>
+                  <table class="table-auto w-full bg-white rounded shadow-md">
+                      <thead>
+                          <tr class="bg-gray-200">
+                              <th class="px-4 py-2">Campaign Name</th>
+                              <th class="px-4 py-2">Progreass</th>
+                              <th class="px-4 py-2">Company</th>
+                              <th class="px-4 py-2">Actions</th>
+                          </tr>
+                      </thead>
+                      <tbody>
+                          {% for request in profile_info.active_campaigns %}
+                          <tr>
+                              <td class="border px-4 py-2">{{ request.campaign.name }}</td>
+                              <td class="border px-4 py-2">   <div class="mt-2">
+                                <div class="relative pt-1">
+                                    <div class="flex mb-2 items-center justify-between">
+                                        <div>
+                                            <span class="text-xs font-semibold inline-block py-1 px-2 uppercase rounded-full text-blue-600 bg-blue-200">
+                                                {{ request.progress }}% Complete
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="overflow-hidden h-2 mb-4 text-xs flex rounded bg-blue-200">
+                                        <div style="width: {{ request.progress }}%" class="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-blue-500"></div>
+                                    </div>
+                                </div>
+                            </div></td>
+                            <td class="border px-4 py-2">{{ request.campaign.sponsor.company }}</td>
+                              
+                              <td class="border px-4 py-2">
+                                <button type="button" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" onclick="openModal('{{ request.campaign.name }}', '{{ request.campaign.description }}', '{{ request.campaign.start_date }}', '{{ request.campaign.end_date }}', '{{ request.campaign.budget }}')">View</button>
+                                 
+                              </td>
+                          </tr>
+                          {% endfor %}
+                      </tbody>
+                  </table>
+
+
+
+                  {%else%}
+
+ 
+              
+                  <h3 class="text-xl font-semibold mb-4 mt-6">On Going Campaigns</h3>
+                  <table class="table-auto w-full bg-white rounded-lg shadow-md">
+                      <thead>
+                          <tr class="bg-gray-200 ">
+                              <th class="px-4 py-2">Campaign Name</th>
+                           
+                              <th class="px-4 py-2">Comapny Name</th>
+                             
+                         
+                            
+                              <th class="px-4 py-2">Actions</th>
+                          </tr>
+                      </thead>
+                      <tbody>
+                          {% for request in profile_info.new_requests %}
+                          <tr>
+                              <td class="border px-4 py-2">id: {{request.id}} {{ request.campaign.name }}</td>
+                             
+                              <td class="border px-4 py-2">{{request.campaign.sponsor.company }}</td>
+                             
+                             
+                              <td class="border px-4 py-2">
+                                <button type="button" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" onclick="openModal('{{ request.campaign.name }}', '{{ request.campaign.description }}', '{{ request.campaign.start_date }}', '{{ request.campaign.end_date }}', '{{ request.campaign.budget }}')">View</button>
+                                  
+                              </td>
+                          </tr>
+                          {% endfor %}
+                      </tbody>
+                  </table>
+
+
+
+
+            
+
+
+
+                  <h3 class="text-xl font-semibold mb-4 mt-10">Flagged Campaigns</h3>
+                  <table class="table-auto w-full bg-white rounded-xl shadow-md">
+                      <thead>
+                          <tr class="bg-gray-200">
+                              <th class="px-4 py-2">Campaign Name</th>
+                       
+                              <th class="px-4 py-2">Company</th>
+                              <th class="px-4 py-2">Actions</th>
+                          </tr>
+                      </thead>
+                      <tbody>
+                          {% for camp in flagged_campaigns %}
+                          <tr>
+                              <td class="border px-4 py-2">{{ camp.name }}</td>
+                             
+                            <td class="border px-4 py-2">{{ camp.sponsor.company }}</td>
+                              
+                              <td class="border px-4 py-2">
+                                <button type="button" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" onclick="openModal('{{camp.name }}', '{{ camp.description }}', '{{ camp.start_date }}', '{{ camp.end_date }}', '{{ camp.budget }}')">View</button>
+                                <form action="{{ url_for('remove_flag') }}" method="POST" style="display:inline;">
+                                  <input type="hidden" name="entity_id" value="{{ camp.id }}">
+                                  <input type="hidden" name="entity_type" value="campaign">
+                                  <input type="hidden" name="action" value="unflag">
+                                  <button type="submit" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">Unflag</button>
+                              </form>
+                              </td>
+                          </tr>
+                          {% endfor %}
+                      </tbody>
+                  </table>
+
+
+
+                  <h3 class="text-xl font-semibold mb-4 mt-10">Flagged Influencers</h3>
+                  <table class="table-auto w-full bg-white rounded-xl shadow-md">
+                      <thead>
+                          <tr class="bg-gray-200">
+                              <th class="px-4 py-2">Username</th>
+                       
+                              <th class="px-4 py-2">Name</th>
+                              <th class="px-4 py-2">Actions</th>
+                          </tr>
+                      </thead>
+                      <tbody>
+                          {% for user in flagged_users %}
+                          <tr>
+                              <td class="border px-4 py-2">{{ user.username }}</td>
+                             
+                            <td class="border px-4 py-2">    {{ user.influencer.name }}</td>
+                              
+                              <td class="border px-4 py-2">
+                                <button type="button" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" onclick="openInfluencerModal('{{ user.influencer.name }}', '{{ user.influencer.category }}','{{ user.influencer.neache }}', '{{ user.influencer.reach }}','{{ user.influencer.earnings }}','{{url_for('static', filename=user.influencer.profile_img)}}')">View</button>
+                                <form action="{{ url_for('remove_flag') }}" method="POST" style="display:inline;">
+                                  <input type="hidden" name="entity_id" value="{{ user.id }}">
+                                  <input type="hidden" name="entity_type" value="user">
+                                  <input type="hidden" name="action" value="unflag">
+                                  <button type="submit" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">Unflag</button>
+                              </form>
+                              </td>
+                          </tr>
+                          {% endfor %}
+                      </tbody>
+                  </table>
+
+
+
+
+                  {%endif%}
+
+                
+                    
+                
+              </div>
+          </div>
+      </div>
+  </div>
+</div>
+
+
+
+
+<div class="fixed z-10 inset-0 overflow-y-auto hidden" id="detailsModal">
+    <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+      <div class="fixed inset-0 transition-opacity" aria-hidden="true">
+        <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
+      </div>
+      <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+      <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+        <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+          <div class="sm:flex sm:items-start">
+            <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+              <h3 class="text-lg leading-6 font-medium text-gray-900" id="modalTitle">Campaign Details</h3>
+              <div class="mt-2">
+                <p><strong>Name:</strong> <span id="modalName"></span></p>
+                <p><strong>Description:</strong> <span id="modalDescription"></span></p>
+                <p><strong>Start Date:</strong> <span id="modalStartDate"></span></p>
+                <p><strong>End Date:</strong> <span id="modalEndDate"></span></p>
+                <p><strong>Payment Amount</strong> $<span id="modalBudget"></span></p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+          <button type="button" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded" onclick="closeModal('detailsModal')">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+
+
+
+
+
+  <div class="fixed z-10 inset-0 overflow-y-auto hidden" id="influencerModal">
+    <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+      <div class="fixed inset-0 transition-opacity" aria-hidden="true">
+        <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
+      </div>
+      <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+      <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+        <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+          <div class="sm:flex sm:items-start">
+            <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+              <h3 class="text-lg leading-6 font-medium text-gray-900" id="modalTitle">Influencer Details</h3>
+              <div class="mt-2">
+                <img id="modalInfluencerProfileImage" src="" alt="Profile Image" class="rounded-full w-32 h-32 mb-4">
+                <p><strong>Name:</strong> <span id="modalInfluencerName"></span></p>
+                <p><strong>Category:</strong> <span id="modalInfluencerCategory"></span></p>
+                <p><strong>Niche:</strong> <span id="modalInfluencerNiche"></span></p>
+                <p><strong>Reach:</strong> <span id="modalInfluencerReach"></span></p>
+                <p><strong></strong> <span id="modalInfluencerEarnings"></span></p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+          <button type="button" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded" onclick="closeModal('influencerModal')">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+
+
+
+
+  <div id="paymentModal" class="fixed z-10 inset-0 overflow-y-auto hidden">
+    <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+        <div class="fixed inset-0 transition-opacity" aria-hidden="true">
+            <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
+        </div>
+
+        <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+
+        <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+            <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                <div class="sm:flex sm:items-start">
+                    <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+                        <h3 class="text-lg leading-6 font-medium text-gray-900">Payment Confirmation</h3>
+                        <div class="mt-2">
+                            <p class="text-sm text-gray-500">Are you sure you want to pay $<span id="paymentAmount"></span> for Ad Request ID: <span id="adRequestId"></span>?</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                <button type="button" onclick="confirmPayment()" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-green-600 text-base font-medium text-white hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 sm:ml-3 sm:w-auto sm:text-sm">Confirm</button>
+                <button type="button" onclick="closePaymentModal()" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:w-auto sm:text-sm">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+{% if profile_info.role == 'Influencer'%}
+<div id="edit-profile-modal" class="fixed z-10 inset-0 overflow-y-auto hidden">
+  <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+      <div class="fixed inset-0 transition-opacity" aria-hidden="true">
+          <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
+      </div>
+      <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+      <div class="inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+          <div>
+              <div class="mt-3 text-center sm:mt-5">
+                  <h3 class="text-lg leading-6 font-medium text-gray-900">Edit Profile</h3>
+                  <div class="mt-2">
+                      <form action="/edit_profile" method="POST" enctype="multipart/form-data">
+                          <div class="mb-4">
+                              <label class="block text-gray-700">Name</label>
+                              <input type="text" name="name" value="{{ influencer.name }}" class="w-full px-3 py-2 border rounded">
+                          </div>
+                          <div class="mb-4">
+                              <label class="block text-gray-700">Category</label>
+                              <input type="text" name="category" value="{{ influencer.category }}" class="w-full px-3 py-2 border rounded">
+                          </div>
+                          <div class="mb-4">
+                              <label class="block text-gray-700">Niche</label>
+                              <input type="text" name="niche" value="{{ influencer.niche }}" class="w-full px-3 py-2 border rounded">
+                          </div>
+                          <div class="mb-4">
+                              <label class="block text-gray-700">Reach</label>
+                              <input type="text" name="reach" value="{{ influencer.reach }}" class="w-full px-3 py-2 border rounded">
+                          </div>
+                          <div class="mb-4">
+                              <label class="block text-gray-700">Profile Image</label>
+                              <input type="file" name="profile_image" class="w-full px-3 py-2 border rounded">
+                          </div>
+                          <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded">Save Changes</button>
+                          <button type="button" id="close-modal-btn" class="bg-red-500 text-white px-4 py-2 rounded">Cancel</button>
+                      </form>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </div>
+</div>
+{%endif%}
+
+{% if profile_info.role == "Sponsor"%}
+
+<div id="edit-profile-modal" class="fixed z-10 inset-0 overflow-y-auto hidden">
+  <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+      <div class="fixed inset-0 transition-opacity" aria-hidden="true">
+          <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
+      </div>
+      <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+      <div class="inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+          <div>
+              <div class="mt-3 text-center sm:mt-5">
+                  <h3 class="text-lg leading-6 font-medium text-gray-900">Edit Profile</h3>
+                  <div class="mt-2">
+                      <form action="/edit_sponsor_profile" method="POST" enctype="multipart/form-data">
+                          <div class="mb-4">
+                              <label class="block text-gray-700">Company Name</label>
+                              <input type="text" name="company_name" value="{{ sponsor.company }}" class="w-full px-3 py-2 border rounded">
+                          </div>
+                          <div class="mb-4">
+                              <label class="block text-gray-700">Industry</label>
+                              <input type="text" name="industry" value="{{ sponsor.industry }}" class="w-full px-3 py-2 border rounded">
+                          </div>
+                          <div class="mb-4">
+                              <label class="block text-gray-700">Budget</label>
+                              <input type="text" name="budget" value="{{ sponsor.budget }}" class="w-full px-3 py-2 border rounded">
+                          </div>
+                          
+                          <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded">Save Changes</button>
+                          <button type="button" id="close-modal-btn" class="bg-red-500 text-white px-4 py-2 rounded">Cancel</button>
+                      </form>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </div>
+</div>
+{%endif%}
+<script>
+  function openInfluencerModal(name, category, niche, reach, message, imageUrl) {
+    document.getElementById('modalInfluencerName').innerText = name;
+    document.getElementById('modalInfluencerCategory').innerText = category;
+    document.getElementById('modalInfluencerNiche').innerText = niche;
+    document.getElementById('modalInfluencerReach').innerText = reach;
+    document.getElementById('modalInfluencerEarnings').innerText = message;
+    document.getElementById('modalInfluencerProfileImage').src = imageUrl;
+    document.getElementById('influencerModal').classList.remove('hidden');
+}
+
+function closeModal(modalId) {
+    document.getElementById(modalId).classList.add('hidden');
+}
+
+
+  function openModal(name, description, startDate, endDate, budget) {
+    document.getElementById('modalName').innerText = name;
+    document.getElementById('modalDescription').innerText = description;
+    document.getElementById('modalStartDate').innerText = startDate;
+    document.getElementById('modalEndDate').innerText = endDate;
+    document.getElementById('modalBudget').innerText = budget;
+    document.getElementById('detailsModal').classList.remove('hidden');
+}
+
+function openPaymentModal(adRequestId, paymentAmount) {
+  document.getElementById('adRequestId').textContent = adRequestId;
+  document.getElementById('paymentAmount').textContent = paymentAmount;
+  document.getElementById('paymentModal').classList.remove('hidden');
+}
+
+function closePaymentModal() {
+  document.getElementById('paymentModal').classList.add('hidden');
+}
+
+function confirmPayment() {
+  const adRequestId = document.getElementById('adRequestId').textContent;
+  fetch(`/pay/${adRequestId}`, {
+      method: 'POST',
+  }).then(response => {
+      if (response.ok) {
+          closePaymentModal();
+          alert('Payment successful');
+          location.reload();
+      } else {
+          closePaymentModal();
+          alert('Payment failed');
+      }
+  });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  const editProfileIcon = document.getElementById('edit-profile-icon');
+  const editProfileModal = document.getElementById('edit-profile-modal');
+  const closeModalBtn = document.getElementById('close-modal-btn');
+
+  editProfileIcon.addEventListener('click', function() {
+      editProfileModal.classList.remove('hidden');
+  });
+
+  closeModalBtn.addEventListener('click', function() {
+      editProfileModal.classList.add('hidden');
+  });
+});
+
+const flashMessage = document.getElementById('flash-message');
+            if (flashMessage) {
+                setTimeout(() => {
+                    flashMessage.classList.add('hidden');
+                }, 2000); // Hide after 5 seconds
+            }
+        
+</script>
+
+
+{% endblock  %}

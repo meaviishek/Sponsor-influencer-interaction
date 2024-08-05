@@ -1,0 +1,321 @@
+{% extends "layout.html" %}
+{% block content %}
+<div>
+  
+
+<nav class="bg-white border-gray-200 dark:bg-gray-900">
+  <div class="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
+  <a href="https://flowbite.com/" class="flex items-center space-x-3 rtl:space-x-reverse">
+      
+      <span class="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">{{user.role}}</span>
+  </a>
+  <div class="flex md:order-2 space-x-3 md:space-x-0 rtl:space-x-reverse">
+    <a href='/logout'>  <button type="button" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Logout</button></a>
+    
+    </button>
+  </div>
+  <div class="items-center justify-between hidden w-full md:flex md:w-auto md:order-1" id="navbar-cta">
+    <ul class="flex flex-col font-medium p-4 md:p-0 mt-4 border border-gray-100 rounded-lg bg-gray-50 md:space-x-8 rtl:space-x-reverse md:flex-row md:mt-0 md:border-0 md:bg-white dark:bg-gray-800 md:dark:bg-gray-900 dark:border-gray-700">
+      <li class=" p-2 text-white rounded-md">
+        <a href="/profile" class="block py-2 px-3 md:p-0 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:dark:hover:text-blue-500 dark:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700">Profile</a>
+      </li>
+      {% if user.role=='Sponsor'%}
+      <li  class=" p-2 text-white rounded-md">
+        <a href="/campaign" class="block py-2 px-3 md:p-0 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:dark:hover:text-blue-500 dark:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700">Campaign</a>
+      </li>
+      {% endif %}
+      <li class=" p-2 text-white rounded-md">
+        <a href="/find" class="block py-2 px-3 md:p-0 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:dark:hover:text-blue-500 dark:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700">Find</a>
+      </li>
+      <li class="bg-blue-500 p-2  text-white rounded-md">
+        <a href="/stats" class="block py-2 px-3 md:p-0 text-white bg-blue-700 rounded md:bg-transparent " aria-current="page">Stats</a>
+      </li>
+     
+    </ul>
+  </div>
+  </div>
+</nav>
+
+<div class="container mx-auto py-8">
+  {% if user.role =='Influencer'%}
+  <div class="container mx-auto py-8">
+    <h2 class="text-3xl font-bold mb-8 text-center">Influencer Statistics</h2>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+    
+        <div class="bg-white p-6 rounded-lg shadow-md">
+            <h3 class="text-xl font-semibold mb-4">Total Campaigns</h3>
+            <p class="text-3xl font-bold">{{ stats_data.total_campaigns }}</p>
+        </div>
+
+      
+        <div class="bg-white p-6 rounded-lg shadow-md">
+            <h3 class="text-xl font-semibold mb-4">Active Campaigns</h3>
+            <p class="text-3xl font-bold">{{ stats_data.active_campaigns }}</p>
+        </div>
+
+     
+        <div class="bg-white p-6 rounded-lg shadow-md">
+            <h3 class="text-xl font-semibold mb-4">Total Earnings</h3>
+            <p class="text-3xl font-bold">${{ stats_data.total_earnings }}</p>
+        </div>
+
+
+        <div class="bg-white p-6 rounded-lg shadow-md">
+            <h3 class="text-xl font-semibold mb-4">Accepted Ad Requests</h3>
+            <p class="text-3xl font-bold">{{ stats_data.accepted_ad_requests }}</p>
+        </div>
+
+    
+        <div class="bg-white p-6 rounded-lg shadow-md">
+            <h3 class="text-xl font-semibold mb-4">Rejected Ad Requests</h3>
+            <p class="text-3xl font-bold">{{ stats_data.rejected_ad_requests }}</p>
+        </div>
+
+     
+        <div class="bg-white p-6 rounded-lg shadow-md">
+            <h3 class="text-xl font-semibold mb-4">Pending Ad Requests</h3>
+            <p class="text-3xl font-bold">{{ stats_data.pending_ad_requests }}</p>
+        </div>
+    </div>
+    
+   
+</div>
+<div class="w-1/2">
+    <canvas id="influencerChart"></canvas>
+    </div>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const ctx = document.getElementById('influencerChart').getContext('2d');
+        const influencerChart = new Chart(ctx, {
+            type: 'bar', // or 'line', 'pie', etc.
+            data: {
+                labels: {{ labels | safe }},
+                datasets: [{
+                    label: 'Earnings',
+                    data: {{ earnings | safe }},
+                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    });
+</script>
+
+{%elif user.role == 'Sponsor'%}
+
+
+<div class="container mx-auto py-8">
+  <h2 class="text-3xl font-bold mb-8 text-center">Sponsor Statistics</h2>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+  
+      <div class="bg-white p-6 rounded-lg shadow-md">
+          <div class="flex items-center justify-between">
+              <div>
+                  <h3 class="text-xl font-semibold">Total Campaigns</h3>
+                  <p class="mt-2 text-3xl font-bold text-blue-500">{{ stats_data.total_campaigns }}</p>
+              </div>
+              <div class="text-blue-500">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .843-3.757 2.116A3.999 3.999 0 015 11H4a1 1 0 000 2h1v1H4a1 1 0 000 2h1v1H4a1 1 0 000 2h1v1h1a4.978 4.978 0 003.757-1.116A3.999 3.999 0 0112 16a3.999 3.999 0 013.757 2.116A4.978 4.978 0 0020 19h1a1 1 0 000-2h-1v-1h1a1 1 0 000-2h-1v-1h1a1 1 0 000-2h-1v-1h1a1 1 0 000-2h-1a3.999 3.999 0 01-3.757-2.116A4.978 4.978 0 0012 8z" />
+                  </svg>
+              </div>
+          </div>
+      </div>
+
+      <div class="bg-white p-6 rounded-lg shadow-md">
+          <div class="flex items-center justify-between">
+              <div>
+                  <h3 class="text-xl font-semibold">Total Budget</h3>
+                  <p class="mt-2 text-3xl font-bold text-green-500">${{ stats_data.total_budget }}</p>
+              </div>
+              <div class="text-green-500">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .843-3.757 2.116A3.999 3.999 0 015 11H4a1 1 0 000 2h1v1H4a1 1 0 000 2h1v1H4a1 1 0 000 2h1v1h1a4.978 4.978 0 003.757-1.116A3.999 3.999 0 0112 16a3.999 3.999 0 013.757 2.116A4.978 4.978 0 0020 19h1a1 1 0 000-2h-1v-1h1a1 1 0 000-2h-1v-1h1a1 1 0 000-2h-1v-1h1a1 1 0 000-2h-1a3.999 3.999 0 01-3.757-2.116A4.978 4.978 0 0012 8z" />
+                  </svg>
+              </div>
+          </div>
+      </div>
+
+     
+      <div class="bg-white p-6 rounded-lg shadow-md">
+          <div class="flex items-center justify-between">
+              <div>
+                  <h3 class="text-xl font-semibold">Total Requests</h3>
+                  <p class="mt-2 text-3xl font-bold text-yellow-500">{{ stats_data.total_requests }}</p>
+              </div>
+              <div class="text-yellow-500">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .843-3.757 2.116A3.999 3.999 0 015 11H4a1 1 0 000 2h1v1H4a1 1 0 000 2h1v1H4a1 1 0 000 2h1v1h1a4.978 4.978 0 003.757-1.116A3.999 3.999 0 0112 16a3.999 3.999 0 013.757 2.116A4.978 4.978 0 0020 19h1a1 1 0 000-2h-1v-1h1a1 1 0 000-2h-1v-1h1a1 1 0 000-2h-1v-1h1a1 1 0 000-2h-1a3.999 3.999 0 01-3.757-2.116A4.978 4.978 0 0012 8z" />
+                  </svg>
+              </div>
+          </div>
+      </div>
+
+      
+      <div class="bg-white p-6 rounded-lg shadow-md">
+          <div class="flex items-center justify-between">
+              <div>
+                  <h3 class="text-xl font-semibold">Accepted Requests</h3>
+                  <p class="mt-2 text-3xl font-bold text-green-500">{{ stats_data.accepted_requests }}</p>
+              </div>
+              <div class="text-green-500">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .843-3.757 2.116A3.999 3.999 0 015 11H4a1 1 0 000 2h1v1H4a1 1 0 000 2h1v1H4a1 1 0 000 2h1v1h1a4.978 4.978 0 003.757-1.116A3.999 3.999 0 0112 16a3.999 3.999 0 013.757 2.116A4.978 4.978 0 0020 19h1a1 1 0 000-2h-1v-1h1a1 1 0 000-2h-1v-1h1a1 1 0 000-2h-1v-1h1a1 1 0 000-2h-1a3.999 3.999 0 01-3.757-2.116A4.978 4.978 0 0012 8z" />
+                  </svg>
+              </div>
+          </div>
+      </div>
+
+  
+      <div class="bg-white p-6 rounded-lg shadow-md">
+          <div class="flex items-center justify-between">
+              <div>
+                  <h3 class="text-xl font-semibold">Rejected Requests</h3>
+                  <p class="mt-2 text-3xl font-bold text-red-500">{{ stats_data.rejected_requests }}</p>
+              </div>
+              <div class="text-red-500">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .843-3.757 2.116A3.999 3.999 0 015 11H4a1 1 0 000 2h1v1H4a1 1 0 000 2h1v1H4a1 1 0 000 2h1v1h1a4.978 4.978 0 003.757-1.116A3.999 3.999 0 0112 16a3.999 3.999 0 013.757 2.116A4.978 4.978 0 0020 19h1a1 1 0 000-2h-1v-1h1a1 1 0 000-2h-1v-1h1a1 1 0 000-2h-1v-1h1a1 1 0 000-2h-1a3.999 3.999 0 01-3.757-2.116A4.978 4.978 0 0012 8z" />
+                  </svg>
+              </div>
+          </div>
+      </div>
+
+    
+      <div class="bg-white p-6 rounded-lg shadow-md">
+          <div class="flex items-center justify-between">
+              <div>
+                  <h3 class="text-xl font-semibold">Pending Requests</h3>
+                  <p class="mt-2 text-3xl font-bold text-yellow-500">{{ stats_data.pending_requests }}</p>
+              </div>
+              <div class="text-yellow-500">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .843-3.757 2.116A3.999 3.999 0 015 11H4a1 1 0 000 2h1v1H4a1 1 0 000 2h1v1H4a1 1 0 000 2h1v1h1a4.978 4.978 0 003.757-1.116A3.999 3.999 0 0112 16a3.999 3.999 0 013.757 2.116A4.978 4.978 0 0020 19h1a1 1 0 000-2h-1v-1h1a1 1 0 000-2h-1v-1h1a1 1 0 000-2h-1v-1h1a1 1 0 000-2h-1a3.999 3.999 0 01-3.757-2.116A4.978 4.978 0 0012 8z" />
+                  </svg>
+              </div>
+          </div>
+      </div>
+
+    
+      <div class="bg-white p-6 rounded-lg shadow-md">
+          <div class="flex items-center justify-between">
+              <div>
+                  <h3 class="text-xl font-semibold">Negotiation Requests</h3>
+                  <p class="mt-2 text-3xl font-bold text-purple-500">{{ stats_data.negotiation_requests }}</p>
+              </div>
+              <div class="text-purple-500">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .843-3.757 2.116A3.999 3.999 0 015 11H4a1 1 0 000 2h1v1H4a1 1 0 000 2h1v1H4a1 1 0 000 2h1v1h1a4.978 4.978 0 003.757-1.116A3.999 3.999 0 0112 16a3.999 3.999 0 013.757 2.116A4.978 4.978 0 0020 19h1a1 1 0 000-2h-1v-1h1a1 1 0 000-2h-1v-1h1a1 1 0 000-2h-1v-1h1a1 1 0 000-2h-1a3.999 3.999 0 01-3.757-2.116A4.978 4.978 0 0012 8z" />
+                  </svg>
+              </div>
+          </div>
+      </div>
+  </div>
+</div>
+<div class="w-1/2">
+<canvas id="sponsorChart"></canvas>
+</div>
+<script>
+    const ctx = document.getElementById('sponsorChart').getContext('2d');
+    const sponsorChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: {{ campaign_names|tojson|safe }},
+            datasets: [{
+                label: 'Budget',
+                data: {{ budgets|tojson|safe }},
+                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                borderColor: 'rgba(75, 192, 192, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+
+</script>
+{%else%}
+
+<div class="container mx-auto py-8">
+    <h2 class="text-3xl font-bold mb-8 text-center">Admin Statistics</h2>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        
+        <div class="bg-white p-6 rounded-lg shadow-md">
+            <h3 class="text-xl font-semibold mb-4">Total Influencers</h3>
+            <p class="text-3xl font-bold">{{ total_influencers }}</p>
+        </div>
+
+       
+        <div class="bg-white p-6 rounded-lg shadow-md">
+            <h3 class="text-xl font-semibold mb-4">Total Sponsors</h3>
+            <p class="text-3xl font-bold">{{ total_sponsors }}</p>
+        </div>
+
+     
+        <div class="bg-white p-6 rounded-lg shadow-md">
+            <h3 class="text-xl font-semibold mb-4">Total Campaigns</h3>
+            <p class="text-3xl font-bold">{{ total_campaigns }}</p>
+        </div>
+
+       
+        <div class="bg-white p-6 rounded-lg shadow-md">
+            <h3 class="text-xl font-semibold mb-4">Active Campaigns</h3>
+            <p class="text-3xl font-bold">{{ active_campaigns }}</p>
+        </div>
+
+        <div class="bg-white p-6 rounded-lg shadow-md">
+            <h3 class="text-xl font-semibold mb-4">Flagged Campaigns</h3>
+            <p class="text-3xl font-bold">{{ flagged_campaigns }}</p>
+        </div>
+
+     
+        <div class="bg-white p-6 rounded-lg shadow-md">
+            <h3 class="text-xl font-semibold mb-4">Total Ad Requests</h3>
+            <p class="text-3xl font-bold">{{ total_ad_requests }}</p>
+        </div>
+
+       
+        <div class="bg-white p-6 rounded-lg shadow-md">
+            <h3 class="text-xl font-semibold mb-4">Accepted Ad Requests</h3>
+            <p class="text-3xl font-bold">{{ accepted_ad_requests }}</p>
+        </div>
+
+        <div class="bg-white p-6 rounded-lg shadow-md">
+            <h3 class="text-xl font-semibold mb-4">Rejected Ad Requests</h3>
+            <p class="text-3xl font-bold">{{ rejected_ad_requests }}</p>
+        </div>
+
+        
+        <div class="bg-white p-6 rounded-lg shadow-md">
+            <h3 class="text-xl font-semibold mb-4">Pending Ad Requests</h3>
+            <p class="text-3xl font-bold">{{ pending_ad_requests }}</p>
+        </div>
+    </div>
+</div>
+
+
+
+
+{%endif%}
+
+</div>
+
+
+
+{% endblock  %}
